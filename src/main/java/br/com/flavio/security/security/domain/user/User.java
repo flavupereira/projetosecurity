@@ -1,5 +1,4 @@
-package br.com.flavio.security.security.domain.produto;
-
+package br.com.flavio.security.security.domain.user;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,28 +10,20 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
-@Table(name = "product")
-@Entity(name = "product")
+@Table(name= "users")
+@Entity(name = "users")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-public class Produto {
+public class User {
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	private String nome;
-	
-	private Integer  price;
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private String id;
 
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	private String Login;
+	private String password;
 	
-
+	
 }
