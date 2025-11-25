@@ -38,8 +38,9 @@ public class ProductController {
 	    @GetMapping
 	    public ResponseEntity getAllProducts() {
 	    	
-	    	List<ProductResponseDTO> productList = 
-	    			this.repository.findAll().stream().map(roductResponseDTO::new).toList())
+	    	List<ProductResponseDTO> productList = this.repository.findAll().stream().map(ProductResponseDTO::new).toList();
+	    	
+	    	return ResponseEntity.ok(productList);
 	    }
 
 }
