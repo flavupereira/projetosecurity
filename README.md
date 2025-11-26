@@ -54,13 +54,167 @@ Um sistema completo de autenticação e autorização usando **Spring Security**
 - ✅ Validação de dados
 
 ###  2. Registro de Usuário
+@PostMapping("/register") 
+public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
+    if(this.userRepository.findbylogin(data.login()) != null) {
+        return ResponseEntity.badRequest().build();
+    }
+    String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
+    User newUser = new User(data.login(), encryptedPassword, data.role());
+    this.userRepository.save(newUser);
+    return ResponseEntity.ok().build();
+}
+
+### Processo:
+
+  Valida se o usuário já existe
+  
+  Criptografa a senha com BCrypt
+  
+  Cria e salva o novo usuário com role específica
+
 ###  3. Login e Geração de Token JWT
+
+     @PostMapping("/login")
+public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
+    var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
+    var auth = this.authenticationManager.authenticate(usernamePassword);
+    var token = tokenService.generateToken((User) auth.getPrincipal());
+    return ResponseEntity.ok(new LoginResponseDTO(token));
+}
+
+### Processo:
+
+1. Cria UsernamePasswordAuthenticationToken com credenciais
+
+2. AuthenticationManager valida as credenciais
+
+3. TokenService gera JWT com subject (login) e expiração
+
+4. Retorna token para o cliente
+
 ###  4. Filtro de Segurança Personalizado
+A classe SecurityFilter intercepta todas as requisições:
+
+@Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    var token = this.recoverToken(request);
+    if(token != null) {
+        var login = tokenService.validateToken(token);
+        UserDetails user = userRepository.findbylogin(login);
+        var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+    filterChain.doFilter(request, response);
+}
+
+### Processo:
+
+1. Extrai token do header Authorization
+
+2. Valida token com TokenService
+
+3. Busca usuário no repositório
+
+4. Configura autenticação no SecurityContextHolder
+
+   
 ###  5. Geração e Validação de Token JWT
+
+     public String generateToken(User user) {
+    try {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        String token = JWT.create()
+            .withIssuer("auth-api")
+            .withSubject(user.getLogin())
+            .withExpiresAt(genExpirationDate())
+            .sign(algorithm);
+        return token;
+    } catch (JWTCreationException exception) {
+        throw new RuntimeException("Error while generating token", exception);
+    }
+}
+
 ## ⚙️ Configuração
+
+    Datasource
+spring.datasource.url=jdbc:postgresql://localhost:5432/product
+spring.datasource.username=
+spring.datasource.password=
+
+  JWT Secret
+api.security.token.secret=${JWT_SECRET:my-secret-key}
+
+  JPA/Hibernate
+spring.jpa.hibernate.ddl-auto=validate
+spring.jpa.show-sql=true
+
 ## 🚀 Como Usar
-## 📡 Endpoints
+  ## 1. Registrar Usuário
+
+  curl -X POST http://localhost:8080/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"login":"admin","password":"123456","role":"ADMIN"}'
+
+  ## 2. Fazer Login
+
+    curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"login":"admin","password":"123456"}'
+
+   ## 3. Acessar Endpoint Protegido
+
+   curl -X GET http://localhost:8080/product \
+  -H "Authorization: Bearer <seu-token-jwt>"
+
+  
+  ## 📡 Endpoints
+
+### 🔓 Públicos
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/auth/register` | Registrar novo usuário |
+| POST | `/auth/login` | Fazer login |
+
+### 🔐 Protegidos
+| Método | Endpoint | Role | Descrição |
+|--------|----------|------|-----------|
+| GET | `/product` | USER, ADMIN | Listar produtos |
+| POST | `/product` | ADMIN | Criar produto |
+
 ## 🛡️ Segurança Implementada
 
+### Autenticação
+- ✅ Validação de credenciais com AuthenticationManager
+- ✅ Tokens JWT com expiração (2 horas)
+- ✅ Senhas criptografadas com BCrypt
+- ✅ Filtro de segurança personalizado
+  
+### Validação
+- ✅ Controle de acesso baseado em roles (UserRole.ADMIN, UserRole.USER)
+- ✅ Hierarquia de permissions (ADMIN tem ROLE_ADMIN + ROLE_USER)
+- ✅ Proteção de endpoints específicos com hasRole()
+
+### Configuração Spring Security
+- ✅ Bean Validation em DTOs (@NotBlank, @NotNull)
+- ✅ Validação de token JWT com assinatura HMAC256
+- ✅ Verificação de usuário único no registro
+
+### Configuração Spring Security
+- ✅ CSRF desabilitado para APIs REST
+- ✅ Sessões stateless
+- ✅ Filtro personalizado antes do filtro de autenticação padrão
+- ✅ Configuração granular de autorização por endpoint
 
 
+### ✅ UserDetails Implementation
+
+A entidade User implementa UserDetails:
+
+@Override
+public Collection<? extends GrantedAuthority> getAuthorities() {
+    if (this.role == UserRole.ADMIN)
+        return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
+    else
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+}
