@@ -187,15 +187,23 @@ bash
 curl -X GET http://localhost:8080/product \
   -H "Authorization: Bearer <seu-token-jwt>"
 
-📡 Endpoints
-🔓 Públicos
-Método	Endpoint	Descrição
-POST	/auth/register	Registrar novo usuário
-POST	/auth/login	Fazer login
-🔐 Protegidos
-Método	Endpoint	Role	Descrição
-GET	/product	USER, ADMIN	Listar produtos
-POST	/product	ADMIN	Criar produto
+```markdown
+## 📡 Endpoints
+
+### 🔓 Públicos
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/auth/register` | Registrar novo usuário |
+| POST | `/auth/login` | Fazer login |
+
+### 🔐 Protegidos
+| Método | Endpoint | Role | Descrição |
+|--------|----------|------|-----------|
+| GET | `/product` | USER, ADMIN | Listar produtos |
+| POST | `/product` | ADMIN | Criar produto |
+```
+
+Aqui está apenas a seção de endpoints no formato markdown. Você pode copiar e colar em seu arquivo README.md!
 
 
 🛡️ Segurança Implementada
