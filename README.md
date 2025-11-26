@@ -10,6 +10,11 @@ Um sistema completo de autenticação e autorização usando **Spring Security**
 
 - [Tecnologias](#-tecnologias)
 - [Funcionalidades](#-funcionalidades)
+- [Fluxo de Autenticação](#-fluxo-de-autenticação)
+- [Configuração](#-configuração)
+- [Como Usar](#-como-usar)
+- [Endpoints](#-endpoints)
+- [Segurança](#-segurança)
 
 
 ## 🛠 Tecnologias
