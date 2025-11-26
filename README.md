@@ -53,3 +53,14 @@ Um sistema completo de autenticação e autorização usando **Spring Security**
 - ✅ DTOs para request/response
 - ✅ Validação de dados
 
+###  2. Registro de Usuário
+###  3. Login e Geração de Token JWT
+###  4. Filtro de Segurança Personalizado
+###  5. Geração e Validação de Token JWT
+## ⚙️ Configuração
+## 🚀 Como Usar
+## 📡 Endpoints
+## 🛡️ Segurança Implementada
+
+
+
