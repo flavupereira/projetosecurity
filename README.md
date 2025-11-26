@@ -54,7 +54,8 @@ Um sistema completo de autenticação e autorização usando **Spring Security**
 - ✅ Validação de dados
 
 ###  2. Registro de Usuário
-@PostMapping("/register") 
+
+``` @PostMapping("/register") 
 public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
     if(this.userRepository.findbylogin(data.login()) != null) {
         return ResponseEntity.badRequest().build();
@@ -64,6 +65,7 @@ public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
     this.userRepository.save(newUser);
     return ResponseEntity.ok().build();
 }
+```
 
 ### Processo:
 
@@ -75,6 +77,7 @@ public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
 
 ###  3. Login e Geração de Token JWT
 
+```
      @PostMapping("/login")
 public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
     var usernamePassword = new UsernamePasswordAuthenticationToken(data.login(), data.password());
@@ -82,7 +85,7 @@ public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
     var token = tokenService.generateToken((User) auth.getPrincipal());
     return ResponseEntity.ok(new LoginResponseDTO(token));
 }
-
+````
 ### Processo:
 
 1. Cria UsernamePasswordAuthenticationToken com credenciais
@@ -96,6 +99,7 @@ public ResponseEntity login(@RequestBody @Valid AuthenticationDTO data){
 ###  4. Filtro de Segurança Personalizado
 A classe SecurityFilter intercepta todas as requisições:
 
+```
 @Override
 protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
     var token = this.recoverToken(request);
@@ -107,7 +111,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
     }
     filterChain.doFilter(request, response);
 }
-
+```
 ### Processo:
 
 1. Extrai token do header Authorization
@@ -121,6 +125,7 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
    
 ###  5. Geração e Validação de Token JWT
 
+```
      public String generateToken(User user) {
     try {
         Algorithm algorithm = Algorithm.HMAC256(secret);
@@ -135,8 +140,9 @@ protected void doFilterInternal(HttpServletRequest request, HttpServletResponse 
     }
 }
 
+```
 ## ⚙️ Configuração
-
+```
     Datasource
 spring.datasource.url=jdbc:postgresql://localhost:5432/product
 spring.datasource.username=
@@ -149,24 +155,25 @@ api.security.token.secret=${JWT_SECRET:my-secret-key}
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=true
 
+```
 ## 🚀 Como Usar
-  ## 1. Registrar Usuário
-
-  curl -X POST http://localhost:8080/auth/register \
+  ### 1. Registrar Usuário
+  
+  ```curl -X POST http://localhost:8080/auth/register \
   -H "Content-Type: application/json" \
   -d '{"login":"admin","password":"123456","role":"ADMIN"}'
+    ```
+  ### 2. Fazer Login
 
-  ## 2. Fazer Login
-
-    curl -X POST http://localhost:8080/auth/login \
+  ``` curl -X POST http://localhost:8080/auth/login \
   -H "Content-Type: application/json" \
   -d '{"login":"admin","password":"123456"}'
-
-   ## 3. Acessar Endpoint Protegido
-
-   curl -X GET http://localhost:8080/product \
+  ```
+   ### 3. Acessar Endpoint Protegido
+   
+   ```curl -X GET http://localhost:8080/product \
   -H "Authorization: Bearer <seu-token-jwt>"
-
+```
   
   ## 📡 Endpoints
 
@@ -211,10 +218,11 @@ spring.jpa.show-sql=true
 
 A entidade User implementa UserDetails:
 
-@Override
+```@Override
 public Collection<? extends GrantedAuthority> getAuthorities() {
     if (this.role == UserRole.ADMIN)
         return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"), new SimpleGrantedAuthority("ROLE_USER"));
     else
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
 }
+```
