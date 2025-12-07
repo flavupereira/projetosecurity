@@ -2,6 +2,7 @@ package br.com.flavio.security.security.infra;
 
 import java.io.IOException;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 @Component
 public class SecurityFilter extends OncePerRequestFilter{
 	
@@ -31,7 +33,7 @@ public class SecurityFilter extends OncePerRequestFilter{
 		if(token != null) {
 			var login = tokenService.validateToken(token);
 			
-			UserDetails user = userRepository.findbylogin(login);
+			UserDetails user = userRepository.findByLogin(login);
 			
 			var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
 			SecurityContextHolder.getContext().setAuthentication(authentication);

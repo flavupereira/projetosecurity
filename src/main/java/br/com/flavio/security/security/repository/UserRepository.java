@@ -2,11 +2,13 @@ package br.com.flavio.security.security.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Repository;
 
 import br.com.flavio.security.security.domain.user.User;
 
-public interface UserRepository extends JpaRepository<User, String> {
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
 	
-	UserDetails findbylogin (String login);
+	UserDetails findByLogin (String login);
 
 }

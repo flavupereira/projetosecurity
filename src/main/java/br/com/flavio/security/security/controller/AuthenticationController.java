@@ -25,10 +25,13 @@ import br.com.flavio.security.security.repository.UserRepository;
 @RestController
 @RequestMapping("auth")
 public class AuthenticationController {
+	
     @Autowired
     private AuthenticationManager authenticationManager;
+    
     @Autowired
     private UserRepository  userRepository;
+    
     @Autowired
     private TokenService tokenService;
 
@@ -44,21 +47,10 @@ public class AuthenticationController {
 	
 	
 	
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-	    return authenticationConfiguration.getAuthenticationManager();
-	}
-	
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-		
-	}
-	
 	@PostMapping("/register") 
 	public ResponseEntity register(@RequestBody @Valid RegisterDTO data) {
 		
-		if(this.userRepository.findbylogin(data.login()) != null) {
+		if(this.userRepository.findByLogin(data.login()) != null) {
 			return ResponseEntity.badRequest().build();
 		}
 		  String encryptedPassword = new BCryptPasswordEncoder().encode(data.password());
